@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SchoolFix - Firebase Multi-User</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,system-ui,sans-serif;background:linear-gradient(135deg,#f4f7ff,#fbfdff);color:#172033}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#eef1ff,#f7fbff)}
+.loginbox{width:min(1050px,100%);display:grid;grid-template-columns:1.1fr .9fr;background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 18px 55px #16203b18}
+.hero{padding:55px;background:linear-gradient(145deg,#312e81,#4f46e5);color:#fff}.brand{font-size:25px;font-weight:900}.hero h1{font-size:46px;line-height:1.05;margin:70px 0 18px}.hero p{line-height:1.7;opacity:.9}.form{padding:42px}.form h2{margin:0 0 8px;font-size:30px}.muted{color:#6b7280}.roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0 20px}.roles button{padding:12px;border:1px solid #e2e5ec;border-radius:11px;background:#fafafa;font-weight:700}.roles button.active{background:#eef0ff;color:#4f46e5;border-color:#6366f1}
+label{display:block;font-size:13px;font-weight:800;margin:13px 0 6px}input,select,textarea{width:100%;padding:12px;border:1px solid #dfe3eb;border-radius:10px;background:#fff}textarea{min-height:100px}.primary{background:#4f46e5;color:white;padding:12px 17px;border-radius:10px;font-weight:800}.secondary{background:#eef0f5;padding:10px 13px;border-radius:9px;font-weight:700}.note{font-size:12px;color:#697386;background:#f7f8fb;padding:11px;border-radius:10px;margin-top:13px;line-height:1.5}
+.side{position:fixed;left:0;top:0;bottom:0;width:235px;background:linear-gradient(180deg,#092b57,#071d3a);color:#cdd3e2;padding:20px 13px;box-shadow:8px 0 30px #08264b22}.side .brand{color:#fff;padding:8px 10px 25px;font-size:24px;letter-spacing:-.5px}.side .brand:before{content:"🎓 ";}.nav button{display:block;width:100%;text-align:left;padding:12px;background:transparent;color:#c5d4e8;border-radius:12px;font-weight:700;margin:5px 0;transition:.2s}.nav button.active,.nav button:hover{background:linear-gradient(90deg,#1687ff,#356dff);color:#fff;box-shadow:0 7px 18px #1687ff33}.logout{position:absolute;bottom:20px;left:13px;right:13px}
+.main{margin-left:235px;padding:25px;max-width:1500px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.top h1{margin:0;font-size:29px;letter-spacing:-.6px}.user{display:flex;gap:10px;align-items:center;background:#fff;padding:7px 12px;border-radius:16px;box-shadow:0 7px 22px #1720330c;border:1px solid #e7ebf2}.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#dff2ff,#dce5ff);color:#1d4ed8;font-weight:900}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.stat,.card{background:#fff;border:1px solid #e5e8ef;border-radius:18px;padding:18px;box-shadow:0 10px 30px #1720330c}.stat small{color:#697386}.num{font-size:30px;font-weight:900;margin:7px 0}.section{margin-top:18px}.two{display:grid;grid-template-columns:1.4fr .9fr;gap:16px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.report{border:1px solid #e5e8ef;border-radius:14px;padding:13px;margin:9px 0;background:#fff}.report h3{font-size:15px;margin:0 0 5px}.meta{font-size:12px;color:#6b7280}.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}.high{background:#fff0f0;color:#c62828}.medium{background:#fff6e4;color:#9a5a00}.low{background:#ecf9f2;color:#087a50}.status{background:#eef0ff;color:#4f46e5}.ai{background:linear-gradient(135deg,#eef0ff,#f8f3ff)}.ai h3{color:#4338a8}.insight{padding:11px 0;border-bottom:1px solid #dddfff;font-size:13px;line-height:1.5}.filters{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px}.progress{height:8px;background:#edf0f5;border-radius:99px;overflow:hidden}.bar{height:100%;background:#4f46e5}.empty{text-align:center;padding:35px;color:#697386}.modal{position:fixed;inset:0;background:#11182788;display:grid;place-items:center;padding:18px;z-index:10}.modalbox{background:#fff;width:min(650px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:22px}.close{float:right;border-radius:50%;width:32px;height:32px}.toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 16px;border-radius:10px;z-index:20}
+/* SchoolFix showcase dashboard styling */
+.sf-hero{position:relative;overflow:hidden;border-radius:22px;padding:27px 30px;margin-bottom:18px;color:#fff;background:linear-gradient(135deg,#0b3d75,#167be8 55%,#5a67f2);box-shadow:0 16px 35px #0b3d7528}.sf-hero:after{content:"🏫  ✨  💡";position:absolute;right:28px;bottom:16px;font-size:38px;opacity:.75}.sf-hero h2{font-size:31px;margin:0 0 7px;letter-spacing:-.7px}.sf-hero p{margin:0;opacity:.92;line-height:1.5}.sf-slogan{display:inline-block;margin-top:15px;padding:8px 13px;border-radius:999px;background:#ffffff1c;border:1px solid #ffffff38;font-weight:800}.sf-kpi{position:relative;overflow:hidden}.sf-kpi:before{content:"";position:absolute;right:-15px;top:-20px;width:75px;height:75px;border-radius:50%;background:#eaf3ff}.sf-kpi .emoji{font-size:25px;position:relative}.sf-kpi .kpi-note{font-size:11px;color:#6b7280}.sf-blue{border-top:4px solid #3b82f6}.sf-orange{border-top:4px solid #f59e0b}.sf-red{border-top:4px solid #ef4444}.sf-green{border-top:4px solid #22c55e}.quick-report{display:flex;align-items:center;justify-content:space-between;gap:15px;background:linear-gradient(135deg,#eef8ff,#f5f3ff);border:1px solid #d9e7ff;border-radius:18px;padding:18px 20px}.quick-report h3{margin:0 0 4px}.quick-report p{margin:0;color:#6b7280;font-size:13px}.big-report{padding:13px 18px!important;background:#fbfdff}.mini-title{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.pipeline{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:12px}.pipe{font-size:10px;text-align:center;color:#6b7280}.pipe b{display:grid;place-items:center;width:30px;height:30px;margin:0 auto 5px;border-radius:50%;background:#edf5ff;color:#2563eb}.activity{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #edf0f5;font-size:12px}.activity:last-child{border-bottom:0}.workflow{background:linear-gradient(160deg,#f4fbff,#f6f3ff)}.workflow-step{display:flex;gap:10px;align-items:center;margin:11px 0;font-size:12px}.workflow-step b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e7f3ff;color:#1d4ed8}.category-row{display:flex;align-items:center;gap:9px;margin:9px 0;font-size:12px}.category-row span{flex:1}.category-row i{height:7px;background:#dbeafe;border-radius:99px;flex:1;overflow:hidden}.category-row i em{display:block;height:100%;background:#3b82f6;border-radius:99px}
+@media(max-width:850px){.side{width:68px}.side .brand span,.nav span{display:none}.nav button{text-align:center}.main{margin-left:68px}.grid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.loginbox{grid-template-columns:1fr}.hero{padding:30px}.hero h1{margin:35px 0 15px}.filters{grid-template-columns:1fr 1fr}}
+@media(max-width:550px){.grid,.filters{grid-template-columns:1fr}.main{padding:16px}}
+</style></head><body>
+
+<div id="login" class="login"><div class="loginbox">
+<div class="hero"><div class="brand">◈ SchoolFix</div><h1>Notice.<br>Understand.<br>Act.</h1><p>A multi-user school improvement platform where students report problems and administration turns them into measurable action.</p></div>
+<div class="form"><h2>Sign in</h2><p class="muted">Firebase cloud-ready prototype</p>
+<div class="roles"><button id="rs" class="active" onclick="choose('student')">🎓 Student</button><button id="ra" onclick="choose('admin')">🛡️ Administration</button></div>
+<label>Email</label><input id="email" type="email" placeholder="student@school.com"><label>Password</label><input id="pass" type="password" placeholder="Password">
+<button class="primary" style="width:100%;margin-top:16px" onclick="signIn()">Sign in</button>
+<div class="note">Cloud connection is enabled for this SchoolFix Firebase project. Use the Firebase Authentication email/password account you created.</div><div class="note">Without Firebase configuration this runs as a local demo. With Firebase configured, reports are shared through Firestore between users.</div></div></div></div>
+
+<div id="app" class="hidden"><aside class="side"><div class="brand">◈ <span>SchoolFix</span></div><div id="nav" class="nav"></div><button class="nav logout" onclick="logout()">↪ <span>Logout</span></button></aside>
+<main class="main"><div class="top"><h1 id="pageTitle">Dashboard</h1><div class="user"><div><b id="who"></b><br><small class="muted" id="mode"></small></div><div class="avatar" id="avatar">S</div></div></div><div id="content"></div></main></div>
+<div id="modal" class="modal hidden"><div id="modalbox" class="modalbox"></div></div><div id="toast" class="toast hidden"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={
+ apiKey:"AIzaSyCn8o16PcScVKuRKMG8Iyn47mwPjEOLUvI",
+ authDomain:"schoolfix-df847.firebaseapp.com",
+ projectId:"schoolfix-df847",
+ storageBucket:"schoolfix-df847.firebasestorage.app",
+ messagingSenderId:"872780024638",
+ appId:"1:872780024638:web:64cfb9377ce9823492ba6f",
+ measurementId:"G-LJ2H22ZLK8"
+};
+// Firebase setup: SchoolFix Firebase project config is prefilled for this project.
+// Then enable Authentication > Email/Password and Firestore Database.
+let firebaseReady=false,auth=null,db=null,unsubscribe=null;
+try{
+ if(!firebaseConfig.apiKey.startsWith("PASTE_")){
+   if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+   auth=firebase.auth();
+   db=firebase.firestore();
+   window.FB={
+     signInWithEmailAndPassword:(a,e,p)=>a.signInWithEmailAndPassword(e,p),
+     signOut:(a)=>a.signOut(),
+     getDoc:(ref)=>ref.get(),
+     doc:(db,path,...parts)=>db.doc([path,...parts].join("/")),
+     collection:(db,path)=>db.collection(path),
+     addDoc:(col,data)=>col.add(data),
+     updateDoc:(ref,data)=>ref.update(data),
+     query:(col,...constraints)=>{let q=col; for(const c of constraints) q=c(q); return q;},
+     where:(field,op,value)=>(q)=>q.where(field,op,value),
+     orderBy:(field,dir)=>(q)=>q.orderBy(field,dir),
+     onSnapshot:(q,success,error)=>q.onSnapshot(success,error)
+   };
+   firebaseReady=true;
+ }
+}catch(e){console.error("Firebase initialization error:",e); firebaseReady=false;}
+
+let role="student",page="dashboard",currentUser=null;
+const $=id=>document.getElementById(id);
+const loginBox=$("login"), appBox=$("app"), emailEl=$("email"), passEl=$("pass"), rsEl=$("rs"), raEl=$("ra"), whoEl=$("who"), avatarEl=$("avatar"), modeEl=$("mode"), navEl=$("nav"), contentEl=$("content"), modalEl=$("modal"), modalboxEl=$("modalbox"), toastEl=$("toast");
+const KEY="schoolfix_demo";
+let reports=JSON.parse(localStorage.getItem(KEY)||"null")||[
+{id:"SF-1042",title:"Fan making unusual noise",category:"Classroom",location:"Class 10-A",description:"Ceiling fan is noisy and slows down.",priority:"High",status:"In Progress",reportedBy:"demo-student",date:"2026-09-03",assigned:"Maintenance"},
+{id:"SF-1041",title:"Leaking water tap",category:"Water",location:"Ground Floor Washroom",description:"Tap is continuously dripping.",priority:"Medium",status:"Received",reportedBy:"demo-student",date:"2026-09-02",assigned:"Plumbing"},
+{id:"SF-1040",title:"Lights left on",category:"Energy",location:"Lab Corridor",description:"Lights remain on after the last period.",priority:"Low",status:"Resolved",reportedBy:"demo-student",date:"2026-09-01",assigned:"Electrical"}];
+
+function save(){localStorage.setItem(KEY,JSON.stringify(reports))}
+function choose(r){role=r;rsEl.classList.toggle("active",r==="student");raEl.classList.toggle("active",r==="admin")}
+async function signIn(){
+ const e=emailEl.value.trim(), p=passEl.value;
+ if(!e||!p){toast("Enter your email and password.");return}
+ if(!firebaseReady){
+   currentUser={uid:"demo-"+e,email:e};
+   openApp();
+   return;
+ }
+ try{
+   const c=await FB.signInWithEmailAndPassword(auth,e,p);
+   currentUser=c.user;
+ }catch(err){
+   console.error("Firebase Auth error:",err);
+   const code=err?.code||"unknown";
+   const msg=code.includes("operation-not-allowed")
+     ? "Email/Password sign-in is not enabled in Firebase Authentication."
+     : code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")
+     ? "Email or password is incorrect."
+     : code.includes("invalid-api-key") ? "The Firebase API key/config is invalid."
+     : code.includes("unauthorized-domain") ? "This website domain is not authorized in Firebase Authentication."
+     : "Firebase sign-in failed: "+code;
+   toast(msg);
+   return;
+ }
+ let storedRole;
+ try{
+   const roleSnap=await FB.getDoc(FB.doc(db,"users",currentUser.uid));
+   const roleExists = typeof roleSnap.exists === "function" ? roleSnap.exists() : !!roleSnap.exists;
+   if(!roleExists){
+     await FB.signOut(auth); currentUser=null;
+     toast("Login worked, but this account has no users/{UID} role document.");
+     return;
+   }
+   storedRole=roleSnap.data()?.role;
+   if(storedRole!=="student" && storedRole!=="admin"){
+     await FB.signOut(auth); currentUser=null;
+     toast("Invalid role. Set role to student or admin in Firestore.");
+     return;
+   }
+ }catch(err){
+   console.error("SchoolFix role/database error:",err);
+   const code=err?.code||"unknown";
+   const message=err?.message||"No error message";
+   await FB.signOut(auth); currentUser=null;
+   toast("Role read failed: "+code+" — "+message);
+   return;
+ }
+ role=storedRole;
+ try{
+   openApp();
+ }catch(err){
+   console.error("SchoolFix app startup error:",err);
+   toast("SchoolFix startup error: "+(err?.message||"Unknown error"));
+ }
+}
+function openApp(){loginBox.classList.add("hidden");appBox.classList.remove("hidden");whoEl.textContent=role==="student"?"Student":"Administration";avatarEl.textContent=role==="student"?"S":"A";modeEl.textContent=firebaseReady?"Cloud mode":"Demo/local mode";buildNav();go("dashboard");if(firebaseReady)listenReports()}
+async function logout(){if(unsubscribe)unsubscribe();if(firebaseReady&&auth)await FB.signOut(auth);currentUser=null;appBox.classList.add("hidden");loginBox.classList.remove("hidden")}
+function buildNav(){let a=role==="student"?[["dashboard","▦","Dashboard"],["report","＋","Report issue"],["my","✓","My reports"],["voice","💡","Student Voice"]]:[["dashboard","▦","Overview"],["reports","☷","All reports"],["analytics","◔","Analytics"],["patterns","⌁","AI Patterns"]];navEl.innerHTML=a.map(x=>`<button id="n-${x[0]}" onclick="go('${x[0]}')">${x[1]} <span>${x[2]}</span></button>`).join("")}
+function go(p){page=p;document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.getElementById("n-"+p)?.classList.add("active");$("pageTitle").textContent={dashboard:role==="student"?"Student Dashboard":"Administration Overview",report:"Report an Issue",my:"My Reports",voice:"Student Voice",reports:"All Reports",analytics:"School Analytics",patterns:"AI Pattern Detection"}[p];render()}
+function stats(){return{total:reports.length,pending:reports.filter(r=>!["Resolved","Verified"].includes(r.status||"Submitted")).length,resolved:reports.filter(r=>["Resolved","Verified"].includes(r.status)).length,high:reports.filter(r=>r.priority==="High"&&r.status!=="Resolved").length}}
+function card(r,admin=false){const priority=String(r.priority||"Medium");const status=String(r.status||"Submitted");const category=String(r.category||"Other");return `<div class="report"><div style="display:flex;justify-content:space-between;gap:8px"><div><h3>${esc(r.title||"Untitled report")}</h3><div class="meta">${r.id||"Cloud report"} · ${esc(r.location||"Unknown location")} · ${esc(category)}</div></div><span class="badge ${priority.toLowerCase()}">${esc(priority)}</span></div><div style="margin-top:8px"><span class="badge status">${esc(status)}</span>${admin?` <button class="secondary" style="float:right" onclick="manage('${r.id}')">Manage</button>`:""}</div></div>`}
+function render(){if(page==="dashboard")role==="student"?studentDash():adminDash();if(page==="report")reportPage();if(page==="my")myReports();if(page==="voice")voice();if(page==="reports")allReports();if(page==="analytics")analytics();if(page==="patterns")patterns()}
+function studentDash(){let s=stats(),uid=currentUser?.uid||"demo-student",mineArr=reports.filter(r=>r.reportedBy===uid),mine=mineArr.length,resolvedMine=mineArr.filter(r=>["Resolved","Verified"].includes(r.status)).length,pendingMine=mineArr.filter(r=>!["Resolved","Verified"].includes(r.status)).length,impact=Math.min(99,72+resolvedMine*5);contentEl.innerHTML=`
+<div class="sf-hero"><h2>😊 Welcome back, ${role==="student"?"Student":"there"}!</h2><p>Your voice matters. Spot a problem, report it, and help make our school better.</p><span class="sf-slogan">🌟 A better school starts with YOU!</span></div>
+<div class="grid">
+<div class="stat sf-kpi sf-blue"><div class="emoji">📋</div><small>My Reports</small><div class="num">${mine}</div><div class="kpi-note">Total submitted →</div></div>
+<div class="stat sf-kpi sf-orange"><div class="emoji">⏳</div><small>Pending</small><div class="num">${pendingMine}</div><div class="kpi-note">Needs attention →</div></div>
+<div class="stat sf-kpi sf-green"><div class="emoji">✅</div><small>Resolved</small><div class="num">${resolvedMine}</div><div class="kpi-note">All good! →</div></div>
+<div class="stat sf-kpi" style="border-top:4px solid #8b5cf6"><div class="emoji">✨</div><small>My Impact</small><div class="num">${impact}%</div><div class="kpi-note">Every report counts</div></div>
+</div>
+<div class="section quick-report"><div><h3>📣 Quick Report</h3><p>Found an issue? Report it in seconds!</p></div><button class="primary" style="padding:14px 24px;border-radius:999px" onclick="go('report')">＋ Report Issue</button></div>
+<div class="section two"><div class="card"><div class="head"><div><div class="mini-title">📝 Your activity</div><h2 style="margin:4px 0">Recent Reports</h2></div><button class="secondary" onclick="go('my')">View all →</button></div>${mineArr.slice(0,5).map(r=>`<div class="report big-report"><div style="display:flex;justify-content:space-between;gap:8px"><div><h3>${esc(r.title||"Untitled report")}</h3><div class="meta">${esc(r.location||"Unknown location")} · ${esc(r.category||"Other")} · ${esc(r.date||"")}</div></div><span class="badge ${String(r.priority||"Medium").toLowerCase()}">${esc(r.priority||"Medium")}</span></div><div style="margin-top:8px"><span class="badge status">${esc(r.status||"Submitted")}</span></div></div>`).join("")||'<div class="empty">No reports yet. Your first report could start a change! 🚀</div>'}</div>
+<div class="card ai"><h3>✨ SchoolFix AI</h3><p class="muted">Smart help for smarter reporting.</p><div class="insight">🤖 <b>Auto-organize:</b> suggests category and priority.</div><div class="insight">📍 <b>Better reports:</b> add an exact location for faster action.</div><div class="insight">🔎 <b>Find patterns:</b> repeated issues can be spotted by administration.</div><div class="insight">💙 <b>Keep speaking up:</b> small reports can lead to big changes.</div></div></div>
+<div class="section card workflow"><div class="mini-title">🚀 SchoolFix Mission</div><h2 style="margin:5px 0">Report Today → Better Tomorrow 😊</h2><p class="muted">See it. Report it. Fix it. Build a better school together.</p></div>`}
+function adminDash(){let s=stats(),open=reports.filter(r=>!["Resolved","Verified"].includes(r.status)),cats={};reports.forEach(r=>cats[r.category||"Other"]=(cats[r.category||"Other"]||0)+1);let topCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,5),maxCat=topCats[0]?.[1]||1;contentEl.innerHTML=`
+<div class="sf-hero"><h2>👋 Real Problems. Real People. <span style="color:#fde047">Real Solutions.</span></h2><p>SchoolFix connects students and administration to turn everyday problems into visible action.</p><span class="sf-slogan">👑 Better Management = A Stronger School!</span></div>
+<div class="grid">
+<div class="stat sf-kpi sf-blue"><div class="emoji">📋</div><small>Total Reports</small><div class="num">${s.total}</div><div class="kpi-note">All reported issues</div></div>
+<div class="stat sf-kpi sf-orange"><div class="emoji">⏰</div><small>Needs Action</small><div class="num">${s.pending}</div><div class="kpi-note">Open or assigned</div></div>
+<div class="stat sf-kpi sf-red"><div class="emoji">🚨</div><small>High Priority</small><div class="num">${s.high}</div><div class="kpi-note">Requires attention</div></div>
+<div class="stat sf-kpi sf-green"><div class="emoji">✅</div><small>Resolved</small><div class="num">${s.resolved}</div><div class="kpi-note">Closed / verified</div></div>
+</div>
+<div class="section two"><div class="card"><div class="head"><div><div class="mini-title">🚨 Action Queue</div><h2 style="margin:4px 0">Problems needing attention</h2></div><button class="secondary" onclick="go('reports')">View All →</button></div>${open.slice(0,6).map(r=>card(r,true)).join("")||'<div class="empty">🎉 Everything is under control!</div>'}</div>
+<div class="card ai"><h3>🧠 AI Command Center ✨</h3><p class="muted">Smarter insights. Faster solutions.</p><div class="insight">🚨 <b>High priority:</b> ${s.high} item(s) need attention.</div><div class="insight">🔎 <b>Pattern scan:</b> group reports by location and category.</div><div class="insight">💡 <b>Suggested focus:</b> investigate repeated classroom equipment issues.</div><div class="insight">🤖 <b>AI demo:</b> duplicate detection + priority triage can reduce manual sorting.</div><button class="primary" style="width:100%;margin-top:12px" onclick="go('patterns')">✨ Run AI Analysis</button></div></div>
+<div class="section two"><div class="card"><div class="mini-title">🔄 Status Pipeline</div><div class="pipeline"><div class="pipe"><b>📄</b>Submitted</div><div class="pipe"><b>📥</b>Received</div><div class="pipe"><b>👤</b>Assigned</div><div class="pipe"><b>🔧</b>In Progress</div><div class="pipe"><b>✅</b>Resolved</div><div class="pipe"><b>✔️</b>Verified</div></div></div><div class="card"><div class="mini-title">🏫 SchoolFix Workflow</div><div class="workflow-step"><b>1</b> Students report</div><div class="workflow-step"><b>2</b> Admin reviews & assigns</div><div class="workflow-step"><b>3</b> Teams solve problems</div><div class="workflow-step"><b>4</b> Students see progress</div></div></div>
+<div class="section two"><div class="card"><div class="mini-title">📊 Top Categories</div>${topCats.map(([k,v])=>`<div class="category-row"><span>${esc(k)}</span><i><em style="width:${Math.round(v/maxCat*100)}%"></em></i><b>${v}</b></div>`).join("")||'<div class="empty">No category data yet.</div>'}</div><div class="card"><div class="mini-title">⚡ Recent Activity</div>${reports.slice(0,5).map(r=>`<div class="activity"><span>📝</span><div><b>${esc(r.title||"Report")}</b><br><span class="muted">${esc(r.location||"Unknown location")} · ${esc(r.status||"Submitted")}</span></div></div>`).join("")||'<div class="empty">No activity yet.</div>'}</div></div>
+<div class="section card" style="background:linear-gradient(135deg,#092b57,#125ca5);color:#fff;text-align:center"><div style="font-size:26px">🚀 Fixing Problems • Building a Better School 🏫</div><p style="margin:8px 0 0;opacity:.9">“See it. Report it. Fix it. Same school, same goal.”</p></div>`}
+function reportPage(){contentEl.innerHTML=`<div class="card" style="max-width:850px"><h2>Report a school issue</h2><p class="muted">In Cloud mode this report is saved to Firestore.</p><label>Category</label><select id="cat"><option>Classroom</option><option>Water</option><option>Energy</option><option>Cleanliness</option><option>Lost & Found</option><option>Accessibility</option><option>Safety</option><option>Canteen</option></select><label>Location</label><input id="loc" placeholder="Class 10-A / Ground Floor"><label>Title</label><input id="rtitle" placeholder="Fan not working"><label>Description</label><textarea id="desc" placeholder="Explain what happened..."></textarea><label>Priority</label><select id="pri"><option>AI Suggested</option><option>High</option><option>Medium</option><option>Low</option></select><button class="primary" style="margin-top:15px" onclick="submitReport()">Submit report</button></div>`}
+function suggest(t){t=t.toLowerCase();if(/danger|sparking|electric|unsafe|flood/.test(t))return"High";if(/leak|broken|overflow|noise|dirty|blocked/.test(t))return"Medium";return"Low"}
+async function submitReport(){let t=rtitle.value.trim(),d=desc.value.trim(),l=loc.value.trim();if(!t||!d||!l){toast("Complete all fields.");return}let r={title:t,category:cat.value,location:l,description:d,priority:pri.value==="AI Suggested"?suggest(t+" "+d):pri.value,status:"Submitted",reportedBy:currentUser?.uid||"demo-student",date:new Date().toISOString().slice(0,10),assigned:"Unassigned"};if(firebaseReady){await FB.addDoc(FB.collection(db,"reports"),r);toast("Report saved to cloud.")}else{r.id="SF-"+(1043+reports.length);reports.unshift(r);save();toast("Saved locally.")}go("my")}
+function myReports(){let uid=currentUser?.uid||"demo-student",a=reports.filter(r=>r.reportedBy===uid||(!firebaseReady&&r.reportedBy==="demo-student"));contentEl.innerHTML=`<div class="card"><div class="head"><h2>My reports</h2><button class="primary" onclick="go('report')">＋ New</button></div>${a.map(r=>card(r)).join("")||'<div class="empty">No reports yet.</div>'}</div>`}
+function voice(){contentEl.innerHTML=`<div class="card" style="max-width:850px"><h2>Student Voice</h2><p class="muted">Share an improvement idea.</p><label>Title</label><input id="vtitle" placeholder="More shaded seating"><label>Idea</label><textarea id="vdesc"></textarea><button class="primary" style="margin-top:12px" onclick="submitVoice()">Share idea</button></div>`}
+async function submitVoice(){let t=vtitle.value.trim(),d=vdesc.value.trim();if(!t||!d){toast("Enter your idea.");return}let r={title:t,category:"Student Voice",location:"Student Suggestion",description:d,priority:"Low",status:"Received",reportedBy:currentUser?.uid||"demo-student",date:new Date().toISOString().slice(0,10),assigned:"Administration"};if(firebaseReady)await FB.addDoc(FB.collection(db,"reports"),r);else{r.id="SF-"+(1043+reports.length);reports.unshift(r);save()}toast("Idea shared.");go("my")}
+function allReports(){contentEl.innerHTML=`<div class="card"><div class="filters"><input id="q" placeholder="Search..." oninput="filterReports()"><select id="fc" onchange="filterReports()"><option>All categories</option></select><select id="fp" onchange="filterReports()"><option>All priorities</option><option>High</option><option>Medium</option><option>Low</option></select><select id="fs" onchange="filterReports()"><option>All statuses</option><option>Submitted</option><option>Received</option><option>Assigned</option><option>In Progress</option><option>Resolved</option><option>Verified</option></select></div><div id="list">${reports.map(r=>card(r,true)).join("")}</div></div>`;[...new Set(reports.map(r=>r.category))].forEach(x=>fc.innerHTML+=`<option>${x}</option>`)}
+function filterReports(){let a=reports.filter(r=>(!q.value||JSON.stringify(r).toLowerCase().includes(q.value.toLowerCase()))&&(fc.value==="All categories"||r.category===fc.value)&&(fp.value==="All priorities"||r.priority===fp.value)&&(fs.value==="All statuses"||r.status===fs.value));list.innerHTML=a.map(r=>card(r,true)).join("")||'<div class="empty">No matching reports.</div>'}
+function manage(id){let r=reports.find(x=>x.id===id);if(!r)return;modalboxEl.innerHTML=`<button class="close" onclick="modalEl.classList.add('hidden')">×</button><h2>${esc(r.title)}</h2><p class="meta">${r.id} · ${esc(r.location)}</p><p>${esc(r.description)}</p><label>Priority</label><select id="mp"><option ${r.priority==="High"?"selected":""}>High</option><option ${r.priority==="Medium"?"selected":""}>Medium</option><option ${r.priority==="Low"?"selected":""}>Low</option></select><label>Assign to</label><select id="ma">${["Unassigned","Maintenance","Electrical","Plumbing","Housekeeping","Administration"].map(x=>`<option ${r.assigned===x?"selected":""}>${x}</option>`).join("")}</select><label>Status</label><select id="ms">${["Submitted","Received","Assigned","In Progress","Resolved","Verified"].map(x=>`<option ${r.status===x?"selected":""}>${x}</option>`).join("")}</select><button class="primary" style="width:100%;margin-top:15px" onclick="updateReport('${id}')">Save changes</button>`;modalEl.classList.remove("hidden")}
+async function updateReport(id){let data={priority:mp.value,assigned:ma.value,status:ms.value};if(firebaseReady)await FB.updateDoc(FB.doc(db,"reports",id),data);else{let r=reports.find(x=>x.id===id);Object.assign(r,data);save()}modalEl.classList.add("hidden");toast("Report updated.");render()}
+function analytics(){let s=stats(),cats={};reports.forEach(r=>cats[r.category]=(cats[r.category]||0)+1);let score=Math.min(100,70+s.resolved*5);contentEl.innerHTML=`<div class="two"><div class="card"><h2>School Improvement Score</h2><div style="font-size:48px;font-weight:900;color:#4f46e5">${score}/100</div><p class="muted">Prototype resolution score.</p><div class="progress"><div class="bar" style="width:${score}%"></div></div></div><div class="card"><h2>Reports by category</h2>${Object.entries(cats).map(([k,v])=>`<p><b>${k}</b> — ${v}</p>`).join("")}</div></div>`}
+function patterns(){let cats={};reports.forEach(r=>cats[r.category]=(cats[r.category]||0)+1);let top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];contentEl.innerHTML=`<div class="two"><div class="card ai"><h3>🧠 AI Pattern Detection — Demo</h3><div class="insight"><b>Top category:</b> ${top?top[0]:"None"} (${top?top[1]:0})</div><div class="insight"><b>Duplicate detection:</b> similar reports can be flagged.</div><div class="insight"><b>Priority triage:</b> text signals can suggest priority.</div><div class="note">In Cloud mode, your Firebase <b>users/{UID}</b> role controls access. The Student/Administration buttons are only for local demo mode.</div><div class="note">AI is simulated locally in this prototype. A production version can connect an approved AI service.</div></div><div class="card"><h2>Workflow</h2><p>1. Review priority.</p><p>2. Identify patterns.</p><p>3. Assign team.</p><p>4. Resolve and verify.</p><p>5. Use analytics.</p></div></div>`}
+function listenReports(){
+ const base=FB.collection(db,"reports");
+ const q=role==="admin"
+   ? base
+   : FB.query(base,FB.where("reportedBy","==",currentUser.uid));
+ unsubscribe=FB.onSnapshot(q,s=>{
+   reports=s.docs.map(d=>({id:d.id,...d.data()}));
+   reports.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+   render();
+ },e=>{console.error(e);toast("Could not load reports. Check Firestore Rules.")});
+}
+function toast(t){toastEl.textContent=t;toastEl.classList.remove("hidden");clearTimeout(window.tt);window.tt=setTimeout(()=>toastEl.classList.add("hidden"),2800)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+Object.assign(window,{choose,signIn,logout,go,submitReport,submitVoice,manage,updateReport,filterReports});
+</script></body></html>
